@@ -48,17 +48,17 @@ let pA(kpA: keymat, pkB: pkey) =
 	 event bA(pk(kpA),pkB,k);
          out(c, penc(sign(k, sk(kpA)), pkB));
  	 in(c,x:bitstring);
-         let xs=sdec(x, k) in 
-         event endA(); 0. 
+         let xs=sdec(x, k) in
+         event endA(); 0.
 
 let pB(kpB: keymat, pkA: pkey) =
-         in(c, y:bitstring); 
+         in(c, y:bitstring);
          let y1=pdec(y, sk(kpB)) in
          if checksign(y1, pkA)=ok() then
          let xk=getmess(y1) in
 	 event eB(pkA,pk(kpB),xk);
-         out(c, senc(s, xk)); 
-	 event endB(); 0. 
+         out(c, senc(s, xk));
+	 event endB(); 0.
 
 process 
          new kpA:keymat; new kpB:keymat;

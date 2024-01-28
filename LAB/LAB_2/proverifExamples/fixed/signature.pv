@@ -1,0 +1,62 @@
+
+
+type pkey.      (* public key *)
+type skey.      (* private key *)
+type keymat.    (* key material *)
+type result.    (* result of check signature *)
+type string.    (* data used to descript the tupla of software metadata *)
+
+free c:channel.     (* the public channel *)
+free sw:bitstring.    (* software name *)
+free swd:string.    (* software metadata *)
+
+(* Public-key Encryption *)
+fun penc(bitstring, pkey): bitstring.
+fun pk(keymat): pkey.
+fun sk(keymat): skey.
+reduc forall x:bitstring,y:keymat; pdec(penc(x,pk(y)), sk(y)) = x.
+
+(* Signatures *)
+fun ok(): result.
+fun sign(bitstring, skey): bitstring.
+reduc forall x:bitstring,y:keymat; getmess(sign(x, sk(y))) = x.
+reduc forall x:bitstring,y:keymat; checksign(sign(x, sk(y)), pk(y)) = ok().
+
+(* Test reachability *)
+event endIssuer().
+event endReceiver().
+query event(endIssuer()).
+query event(endReceiver()).
+
+(* Test authentication *)
+event authenticated(bitstring,string).
+event issued(bitstring,string).
+query x:bitstring,y:string; event(authenticated(x,y)) ==> event(issued(x,y)).
+
+(* The process *)
+
+let issuer(kpIssuer:keymat, sw:bitstring, swd:string) =
+    event issued(sw, swd);
+    out(c, sign((sw, swd), sk(kpIssuer)));
+    event endIssuer(); 0.
+
+let receiver(pkIssuer: pkey) =
+    in(c, info:bitstring);
+    if checksign(info, pkIssuer) = ok() then
+    let (swInfo:bitstring, swdInfo:string) = getmess(info) in
+    event authenticated(swInfo, swdInfo);
+    event endReceiver(); 0.
+
+process
+    new kpIssuer: keymat;
+    (!out(c, pk(kpIssuer)); 0 |
+    !(new sw:bitstring;
+    new swd:string;
+    !issuer(kpIssuer, sw, swd)) | !receiver(pk(kpIssuer))
+    )
+
+(* EXPECTPV
+Query not event(endIssuer) is false.    l'evento end si verifica
+Query not event(endReceiver) is false.  l'evento end si verifica
+Query event(authenticated(x,y)) ==> event(issued(x,y)) is true.  l'evento authenticated si verifica dopo un evento issued
+END *)
