@@ -4,6 +4,10 @@
 
 void func(int a, int b, int c){
 
+        printf("a: %d", a);
+        printf("b: %d", b);
+        printf("c: %d", c);
+
 	char buffer[128];
 	int response = 0;
 

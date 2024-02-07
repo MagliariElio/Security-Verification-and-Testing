@@ -11,7 +11,7 @@ gets(s);
 if(x==0xcafecafe)
 	printf("You won!\n");
 else
-	printf("Nope");
+	printf("Nope\n");
 return 0;
 }
 
