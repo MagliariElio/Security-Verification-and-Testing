@@ -1,13 +1,26 @@
 L'analisi di flusso è una tecnica utilizzata per raccogliere informazioni sul possibile insieme di valori calcolati in vari punti di un programma.
 Il CFG di un programma viene utilizzato per determinare le parti di un programma a cui un particolare valore assegnato a una variabile potrebbe propagarsi. Le informazioni vengono spesso utilizzate dai compilatori per l'ottimizzazione di un programma.
-Un esempio canonico di dataflow analysis è il definition reaching.
+Un esempio canonico di dataflow analysis è il reaching definition.
 
 Un modo semplice per eseguire il dataflow analysis è quello di impostare equazioni del flusso di dati per ogni
-blocco del CFG e risolverle calcolando ripetutamente l'output dell'input localmente ad ogni blocco fino a
+basic block del CFG e risolverle calcolando ripetutamente l'output locale ad ogni basic block fino a
 quando l'intero sistema non si stabilizza, cioè raggiunge un fixpoint.
 
-Il dataflow analysis utilizza un modello di dati astratto per le variabili, dove per ogni blocco:
-    - calcolo di una funzione di trasferimento D' = fb(D), dove D e D' sono il modello delle variabili prima e dopo l'esecuzione e la funzione di trasferimento rappresenta come i valori astratti vengono modificati dal blocco base.
-    - l'output del blocco base precedente influisce nell'output del blocco base successivo
-Si definisce, inoltre, un algoritmo iterativo per trovare il valore di D all'inizio e alla fine di ogni blocco base.
+Il dataflow analysis utilizza un modello di dati astratto per le variabili, dove per ogni basic block:
+    - si calcola una funzione di trasferimento D' = fb(D), dove D e D' sono il modello delle variabili prima e dopo l'esecuzione e la funzione di trasferimento rappresenta come i valori astratti vengono modificati dal basic block.
+    - l'output del basic block precedente influisce nell'output del basic block successivo
+Si definisce, inoltre, un algoritmo iterativo per trovare il valore di D all'inizio e alla fine di ogni basic block.
 
+
+Flow analysis is a technique used to gather information about the possible set of values calculated at various points in a program.
+The CFG of a program is used to determine the parts of a program to which a particular value assigned to a variable could propagate. Information is often used by compilers to optimize a program.
+A canonical example of dataflow analysis is reaching definition.
+
+An easy way to perform dataflow analysis is to set data flow equations for each
+basic block of the CFG and solve them by repeatedly calculating the local output to each basic block up to
+when the whole system does not stabilize, that is, reaches a fixpoint.
+
+Dataflow analysis uses an abstract data model for variables, where for each basic block:
+    - a transfer function D' = fb(D) is calculated, where D and D' are the model of the variables before and after execution, and the transfer function represents how the abstract values are modified by the basic block.
+    - the output of the previous basic block affects the output of the next basic block
+It also defines an iterative algorithm to find the value of D at the beginning and end of each basic block.
