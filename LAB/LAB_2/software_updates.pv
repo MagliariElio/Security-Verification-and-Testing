@@ -1,0 +1,45 @@
+
+
+type keymat.
+type pkey.
+type skey.
+type result.
+type string.
+
+free c: channel.
+
+fun pk(keymat): pkey.
+fun sk(keymat): skey.
+
+fun sign(bitstring, skey): bitstring.
+fun ok(): result.
+reduc forall x:keymat, m:bitstring; getmess(sign(m, sk(x))) = m.
+reduc forall x:keymat, m:bitstring; checkSign(sign(m, sk(x)), pk(x)) = ok().
+
+event endI().
+event endR().
+query event(endI()).
+query event(endR()).
+
+event send(bitstring, string).
+event receive(bitstring, string).
+query x:bitstring, y:string; event(receive(x,y)) ==> event(send(x,y)).
+
+let issuer(kpI: keymat, sw: bitstring, swd: string) =
+	event send(sw, swd);
+	out(c, sign((sw, swd), sk(kpI)));
+	event endI(); 0.
+	
+let receiver(pkI: pkey) =
+	in(c, mR: bitstring);
+	if checkSign(mR, pkI)=ok() then
+	let (swR:bitstring, swdR:string) = getmess(mR) in
+	event receive(swR, swdR);
+	event endR(); 0.
+	
+process
+	new kpI: keymat; new sw: bitstring; new swd: string;
+	( !out(c, pk(kpI)); 0 |
+	!issuer(kpI, sw, swd) | !receiver(pk(kpI))
+	)
+

@@ -1,0 +1,58 @@
+ (*
+   Example of weak secret 
+ *)
+
+free c:channel.			(* the public channel *)
+free s:bitstring [private]. 	(* the secret *)
+type result.
+
+(* Cryptographic Hash *)
+fun hash(bitstring): bitstring.
+fun ok(): result.
+
+(* Test whether s is secret *)
+query attacker(s).
+
+(* Test whether s is subject to offline guessing attacks *)
+weaksecret s.
+
+(* Test reachability *)
+event endS().
+event endR().
+query event(endS()).
+query event(endR()).
+
+event send(bitstring, bitstring).
+event receive(bitstring, bitstring).
+query x:bitstring, y:bitstring; inj-event(receive(x,y)) ==> inj-event(send(x,y)).
+
+(* The process *)
+
+let pS() =
+	 new nonce: bitstring;
+	 let hashs = hash((s,nonce)) in
+	 event send(nonce, hashs);
+         out(c, (nonce, hashs));
+         event endS(); 0. 
+
+let pR() =
+         in(c, y:bitstring);
+         let (nonce:bitstring, hashr:bitstring) = y in
+         event receive(nonce, hashr);
+         let hashc = hash((s, nonce)) in
+         if hashc = hashr then 
+	 event endR();
+	 0.
+
+process 
+         (
+          !pS()  | !pR()
+         )
+
+
+(* EXPECTPV
+Query not attacker(s[]) is true.
+Weak secret s is false.
+Query not event(endS) is false.
+Query not event(endR) is false.
+END *)

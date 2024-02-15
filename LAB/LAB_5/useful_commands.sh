@@ -1,4 +1,4 @@
-sudo apt-get update
+# sudo apt-get update
 sudo apt-get install python3-dev libffi-dev build-essential virtualenvwrapper
 
 export WORKON_HOME=$HOME/.virtualenvs
